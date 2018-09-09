@@ -11,9 +11,25 @@
 		
 		var score:int = 0;
 		
+		var gameOver:GameOver = new GameOver();
+		var restart:Restart = new Restart();
+		
+		var bgMusic:BGMusic = new BGMusic();
+		
 		/** The constructor of the Game class. */
 		public function Game() {
+			//Start background music.
+			bgMusic.play();
+			
+			//Start gameLoop.
 			addEventListener(Event.ENTER_FRAME, gameLoop);
+			
+			//Spawn gameOver and restart screens, but keep them invisible.
+			addChild(gameOver);
+			gameOver.visible = false;
+			
+			addChild(restart);
+			restart.visible = false;
 			
 		}
 		/**
@@ -23,27 +39,62 @@
 		 */
 		function gameLoop(e:Event):void {
 			
-			// 1. measure how much time has passed
-			// 2. get user input
-			// 3. update everything
-			
 			thingy.update(); // update design pattern!
-			if(thingy.unscoredPoints > 0){
+			thingy2.update();
+			thingy3.update();
+			if(thingy.unscoredPoints > 0 || thingy2.unscoredPoints > 0 || thingy3.unscoredPoints > 0){
 				score += thingy.unscoredPoints;
 				thingy.unscoredPoints = 0;
+				
+				score += thingy2.unscoredPoints;
+				thingy2.unscoredPoints = 0;
+				
+				score += thingy3.unscoredPoints;
+				thingy3.unscoredPoints = 0;
 			}
 			
+			//Update scoreboard.
 			scoreboard.text = "SCORE: " + score;
 			
-			if(thingy.isOutOfBounds){
-				// game over...
+			//Displays gameover and restart screen when all objects are out of bounds.
+			if(thingy.isOutOfBounds && thingy2.isOutOfBounds && thingy3.isOutOfBounds){
+				
+				gameOver.x = 400;
+				gameOver.y = 250;
+				gameOver.visible = true;
+				
+				scoreboard.x = 300;
+				scoreboard.y = 300;
+				
+				restart.x = 400;
+				restart.y = 400;
+				restart.visible = true;
+				restart.buttonMode = true;
+				restart.addEventListener(MouseEvent.CLICK, restartGame);
+				
 			}
-			
-			// 4. draw everything		
-			
+			else{
+				gameOver.visible = false;
+				restart.visible = false
+				restart.buttonMode = false;
+				restart.removeEventListener(MouseEvent.CLICK, restartGame);
+			}
 			
 		} // ends gameLoop
 		
+		//Restarts the game.
+		function restartGame(e:MouseEvent):void {
+			
+			thingy.resetThingy();
+			thingy2.resetThingy();
+			thingy3.resetThingy();
+			
+			scoreboard.x = 15.35;
+			scoreboard.y = 11.30;
+			
+			score = 0;
+			
+		} // ends restartGame
 		
 	} // ends Game class
 	
